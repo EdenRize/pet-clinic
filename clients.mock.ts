@@ -1,9 +1,9 @@
-import { Client } from "models/clients.interface";
-import { PetType } from "models/pet-type.interface";
+import { IClient } from "models/clients.interface";
+import { PetType } from "models/pet-type.enum";
 
 const { CAT, DOG, PARROT } = PetType;
 
-export const clients: Client[] = [
+export const clients: IClient[] = [
   {
     name: "John Doe",
     phone: "555-1234",

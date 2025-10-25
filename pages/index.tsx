@@ -1,4 +1,4 @@
-import { PetClinicDashboard } from "@/components/pet-clinic-dashboard";
+import { PetClinicDashboard } from "@/components/PetClinitDashboard";
 import type { NextPage } from "next";
 
 const Home: NextPage = () => {
