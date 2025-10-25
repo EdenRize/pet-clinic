@@ -5,15 +5,32 @@ import { RequestMethod } from "./models/request-method.enum";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<IClient[] | { error: string }>,
+  res: NextApiResponse<IClient | IClient[] | { error: string }>,
 ) {
-  if (req.method === RequestMethod.GET) {
-    try {
-      const db = await getClientsDatabase();
-      const clients = await db.find({}).toArray();
-      res.status(200).json(clients);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch clients" });
-    }
+  switch (req.method) {
+    case RequestMethod.GET:
+      try {
+        const db = await getClientsDatabase();
+        const clients = await db.find({}).toArray();
+        res.status(200).json(clients);
+      } catch (error) {
+        res.status(500).json({ error: "Failed to fetch clients" });
+      }
+      break;
+
+    case RequestMethod.POST:
+      try {
+        const db = await getClientsDatabase();
+        const newClient: IClient = req.body;
+        await db.insertOne(newClient);
+        res.status(200);
+      } catch (error) {
+        res.status(500).json({ error: "Failed to create client" });
+      }
+      break;
+
+    default:
+      res.setHeader("Allow", ["GET", "POST"]);
+      res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }

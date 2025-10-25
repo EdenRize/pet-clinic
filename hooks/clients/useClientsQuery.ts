@@ -1,11 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchClients } from "@/lib/clients/api";
+import { QueryKeys } from "models/query-keys.enum";
 
-export const useClients = () => {
+export const useClientsQuery = () => {
   return useQuery({
-    queryKey: ["clients"],
+    queryKey: [QueryKeys.CLIENTS],
     queryFn: fetchClients,
-    retry: false,
-    refetchOnWindowFocus: false,
   });
 };

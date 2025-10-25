@@ -1,11 +1,32 @@
+import axios from "axios";
 import { IClient } from "../models/clients.interface";
 
 export const fetchClients = async (): Promise<IClient[]> => {
-  const response = await fetch("/api/clients");
-  
-  if (!response.ok) {
-    throw new Error(`Failed to fetch clients: ${response.status}`);
+  try {
+    const response = await axios({ url: "/api/clients", method: "GET" });
+
+    if (!response.status) {
+      throw new Error(`Failed to fetch clients: ${response.status}`);
+    }
+
+    return response.data;
+  } catch (error) {
+    throw error;
   }
-  
-  return response.json();
+};
+
+export const createClient = async (client: IClient): Promise<IClient> => {
+  try {
+    const response = await axios({
+      url: "/api/clients",
+      data: client,
+      method: "POST",
+    });
+    if (!response.status) {
+      throw new Error(`Failed to create a client: ${response.status}`);
+    }
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 };
