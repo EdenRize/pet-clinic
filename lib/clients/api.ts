@@ -46,3 +46,17 @@ export const updateClient = async (client: IClient): Promise<IClient> => {
     throw error;
   }
 };
+
+export const deleteClient = async (clientId: string): Promise<void> => {
+  try {
+    const response = await axios({
+      url: `/api/clients?id=${clientId}`,
+      method: "DELETE",
+    });
+    if (!response.status) {
+      throw new Error(`Failed to delete client: ${response.status}`);
+    }
+  } catch (error) {
+    throw error;
+  }
+};

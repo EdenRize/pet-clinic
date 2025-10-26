@@ -1,6 +1,7 @@
 import { useClientsQuery } from "@/hooks/clients/useClientsQuery";
 import { useCreateClient } from "@/hooks/clients/useCreateClient";
 import { useUpdateClient } from "@/hooks/clients/useUpdateClient";
+import { useDeleteClient } from "@/hooks/clients/useDeleteClient";
 import { AppLoader } from "./AppLoader";
 import { ClientsTable } from "./ClientsTable";
 import { useState, useEffect } from "react";
@@ -29,8 +30,9 @@ export const PetClinicDashboard = () => {
   const { isPending: isCreating, mutateAsync: addClient } = useCreateClient();
   const { isPending: isUpdating, mutateAsync: updateClient } =
     useUpdateClient();
+  const { isPending: isDeleting, mutateAsync: deleteClient } = useDeleteClient();
 
-  const isPending = isCreating || isUpdating;
+  const isPending = isCreating || isUpdating || isDeleting;
 
   useEffect(() => {
     if (error) {
@@ -60,6 +62,19 @@ export const PetClinicDashboard = () => {
       onCloseClientModal();
     } catch (error) {
       setSnackbar({ msg: "Failed to save client", severity: Severity.ERROR });
+    }
+  };
+
+  const handleDelete = async (clientId: string) => {
+    try {
+      await deleteClient(clientId);
+      setSnackbar({
+        msg: "Client deleted successfully",
+        severity: Severity.SUCCESS,
+      });
+      onCloseClientModal();
+    } catch (error) {
+      setSnackbar({ msg: "Failed to delete client", severity: Severity.ERROR });
     }
   };
 
@@ -105,6 +120,7 @@ export const PetClinicDashboard = () => {
           {...clientModal}
           onSubmit={handleSubmit}
           onClose={onCloseClientModal}
+          onDelete={handleDelete}
         />
       </div>
 

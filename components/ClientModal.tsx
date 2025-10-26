@@ -9,6 +9,7 @@ import { PetTypeSelect } from "./common/PetTypeSelect";
 
 interface IClientModalTitleProps {
   client: IClient | null;
+  onDelete?: (clientId: string) => void;
 }
 
 interface IClientModalInputFieldsProps {
@@ -31,6 +32,7 @@ export interface IClientModal {
 interface IClientModalProps extends IClientModal {
   onClose: () => void;
   onSubmit: (client: IClient) => void;
+  onDelete?: (clientId: string) => void;
 }
 
 export const ClientModal = ({
@@ -38,6 +40,7 @@ export const ClientModal = ({
   client,
   onClose,
   onSubmit,
+  onDelete,
 }: IClientModalProps) => {
   const [formData, setFormData] = useState<IClient>({
     name: client?.name || "",
@@ -73,7 +76,7 @@ export const ClientModal = ({
   return (
     <Modal open={isOpen} onClose={handleOnClose}>
       <div className="fixed flex flex-col gap-4 bg-white top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  p-6 rounded-lg shadow-xl min-w-[400px]">
-        <ClientModalTitle client={client} />
+        <ClientModalTitle client={client} onDelete={onDelete} />
         <ClientModalInputFields
           client={client}
           formData={formData}
@@ -89,7 +92,13 @@ export const ClientModal = ({
   );
 };
 
-const ClientModalTitle = ({ client }: IClientModalTitleProps) => {
+const ClientModalTitle = ({ client, onDelete }: IClientModalTitleProps) => {
+  const handleDelete = () => {
+    if (client?._id && onDelete) {
+      onDelete(client._id.toString());
+    }
+  };
+
   if (client) {
     return (
       <div className={"flex items-center justify-between"}>
@@ -97,7 +106,7 @@ const ClientModalTitle = ({ client }: IClientModalTitleProps) => {
           <EditIcon />
           <p>Edit client</p>
         </div>
-        <DeleteIcon />
+        <DeleteIcon className="cursor-pointer" onClick={handleDelete} />
       </div>
     );
   }
