@@ -2,8 +2,10 @@ import * as React from "react";
 import {
   useReactTable,
   getCoreRowModel,
+  getSortedRowModel,
   flexRender,
   createColumnHelper,
+  SortingState,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -14,8 +16,12 @@ import {
   TableContainer,
   Paper,
   IconButton,
+  Box,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import { IClient } from "models/clients.interface";
 
 interface ClientsTableProps {
@@ -24,12 +30,50 @@ interface ClientsTableProps {
 }
 
 export const ClientsTable = ({ clients, onEditClient }: ClientsTableProps) => {
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const columnHelper = createColumnHelper<IClient>();
 
+  const createSortableHeader =
+    (label: string) =>
+    ({ column }: any) =>
+      (
+        <Box
+          display={"flex"}
+          alignItems={"center"}
+          gap={1}
+          sx={{ cursor: "pointer" }}
+          onClick={() => column.toggleSorting()}
+        >
+          {label}
+          {column.getIsSorted() === "asc" ? (
+            <ArrowUpwardIcon fontSize="small" />
+          ) : column.getIsSorted() === "desc" ? (
+            <ArrowDownwardIcon fontSize="small" />
+          ) : (
+            <UnfoldMoreIcon fontSize="small" />
+          )}
+        </Box>
+      );
+
+  const caseInsensitiveSortingFn =
+    (accessor: string) => (rowA: any, rowB: any) => {
+      const a = rowA.getValue(accessor).toLowerCase();
+      const b = rowB.getValue(accessor).toLowerCase();
+      return a.localeCompare(b);
+    };
+
   const columns = [
-    columnHelper.accessor("name", { header: "Client Name" }),
+    columnHelper.accessor("name", {
+      header: createSortableHeader("Client Name"),
+      enableSorting: true,
+      sortingFn: caseInsensitiveSortingFn("name"),
+    }),
     columnHelper.accessor("phone", { header: "Phone" }),
-    columnHelper.accessor("petName", { header: "Pet Name" }),
+    columnHelper.accessor("petName", {
+      header: createSortableHeader("Pet Name"),
+      enableSorting: true,
+      sortingFn: caseInsensitiveSortingFn("petName"),
+    }),
     columnHelper.accessor("petAge", { header: "Pet Age" }),
     columnHelper.accessor("petType", { header: "Pet Type" }),
     columnHelper.display({
@@ -50,7 +94,12 @@ export const ClientsTable = ({ clients, onEditClient }: ClientsTableProps) => {
   const table = useReactTable({
     data: clients,
     columns,
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
 
   return (
