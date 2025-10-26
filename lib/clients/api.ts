@@ -30,3 +30,19 @@ export const createClient = async (client: IClient): Promise<IClient> => {
     throw error;
   }
 };
+
+export const updateClient = async (client: IClient): Promise<IClient> => {
+  try {
+    const response = await axios({
+      url: "/api/clients",
+      data: client,
+      method: "PUT",
+    });
+    if (!response.status) {
+      throw new Error(`Failed to update client: ${response.status}`);
+    }
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

@@ -1,5 +1,6 @@
 import { useClientsQuery } from "@/hooks/clients/useClientsQuery";
 import { useCreateClient } from "@/hooks/clients/useCreateClient";
+import { useUpdateClient } from "@/hooks/clients/useUpdateClient";
 import { AppLoader } from "./AppLoader";
 import { ClientsTable } from "./ClientsTable";
 import { useState, useEffect } from "react";
@@ -25,7 +26,12 @@ export const PetClinicDashboard = () => {
   });
 
   const { data: clients, isLoading, error } = useClientsQuery();
-  const { isPending, mutateAsync: addClient } = useCreateClient();
+  const { isPending: isCreating, mutateAsync: addClient } = useCreateClient();
+  const { isPending: isUpdating, mutateAsync: updateClient } =
+    useUpdateClient();
+
+  const isPending = isCreating || isUpdating;
+
   useEffect(() => {
     if (error) {
       setSnackbar({ msg: error.message, severity: Severity.ERROR });
@@ -39,15 +45,19 @@ export const PetClinicDashboard = () => {
   const handleSubmit = async (formData: IClient) => {
     try {
       if (clientModal.client) {
-        // TODO: Update client logic here
+        await updateClient({ ...formData, _id: clientModal.client._id });
+        setSnackbar({
+          msg: "Client updated successfully",
+          severity: Severity.SUCCESS,
+        });
       } else {
         await addClient(formData);
         setSnackbar({
           msg: "Client created successfully",
           severity: Severity.SUCCESS,
         });
-        onCloseClientModal();
       }
+      onCloseClientModal();
     } catch (error) {
       setSnackbar({ msg: "Failed to save client", severity: Severity.ERROR });
     }
@@ -64,7 +74,10 @@ export const PetClinicDashboard = () => {
   return (
     <section>
       <div className={`${isPending && "opacity-30 pointer-events-none"}`}>
-        <ClientsTable clients={clients || []} />
+        <ClientsTable
+          clients={clients || []}
+          onEditClient={onOpenClientModal}
+        />
 
         <Button
           variant="contained"

@@ -13,14 +13,17 @@ import {
   TableRow,
   TableContainer,
   Paper,
+  IconButton,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import { IClient } from "models/clients.interface";
 
 interface ClientsTableProps {
   clients: IClient[];
+  onEditClient: (client: IClient) => void;
 }
 
-export const ClientsTable = ({ clients }: ClientsTableProps) => {
+export const ClientsTable = ({ clients, onEditClient }: ClientsTableProps) => {
   const columnHelper = createColumnHelper<IClient>();
 
   const columns = [
@@ -29,6 +32,19 @@ export const ClientsTable = ({ clients }: ClientsTableProps) => {
     columnHelper.accessor("petName", { header: "Pet Name" }),
     columnHelper.accessor("petAge", { header: "Pet Age" }),
     columnHelper.accessor("petType", { header: "Pet Type" }),
+    columnHelper.display({
+      id: "actions",
+      header: "Actions",
+      cell: (props) => (
+        <IconButton
+          onClick={() => onEditClient(props.row.original)}
+          size="small"
+          color="primary"
+        >
+          <EditIcon />
+        </IconButton>
+      ),
+    }),
   ];
 
   const table = useReactTable({
