@@ -7,6 +7,7 @@ module.exports = {
   theme: {
     colors: {
       primary: "#4D4DFE",
+      white: "#FFFFFF",
     },
     fontFamily: {
       mono: ["Roboto", "monospace"],

@@ -22,8 +22,9 @@ export default async function handler(
       try {
         const db = await getClientsDatabase();
         const newClient: IClient = req.body;
-        await db.insertOne(newClient);
-        res.status(200);
+        const result = await db.insertOne(newClient);
+        const insertedClient = await db.findOne({ _id: result.insertedId });
+        res.status(200).json(insertedClient as IClient);
       } catch (error) {
         res.status(500).json({ error: "Failed to create client" });
       }
